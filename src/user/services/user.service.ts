@@ -12,15 +12,15 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  public async create(body: UserDTO): Promise<UserEntity> {
+  public async createUser(body: UserDTO): Promise<UserEntity> {
     try {
       return await this.userRepository.save(body);
     } catch (error) {
-      throw new ErrorManager.createSignatureError(error.message);
+      throw ErrorManager.createSignatureError(error.message);
     }
   }
 
-  public async findAll(): Promise<UserEntity[]> {
+  public async findAllUsers(): Promise<UserEntity[]> {
     try {
       const users: UserEntity[] = await this.userRepository.find();
       if (!users.length) {
@@ -31,11 +31,11 @@ export class UserService {
       }
       return users;
     } catch (error) {
-      throw new ErrorManager.createSignatureError(error.message);
+      throw ErrorManager.createSignatureError(error.message);
     }
   }
 
-  public async findOne(id: string): Promise<UserEntity> {
+  public async findUserById(id: string): Promise<UserEntity> {
     try {
       const user: UserEntity = await this.userRepository.findOneBy({ id });
       if (!user) {
@@ -46,11 +46,11 @@ export class UserService {
       }
       return user;
     } catch (error) {
-      throw new ErrorManager.createSignatureError(error.message);
+      throw ErrorManager.createSignatureError(error.message);
     }
   }
 
-  public async update(
+  public async updateUser(
     id: string,
     body: UserUpdateDTO,
   ): Promise<UpdateResult | undefined> {
@@ -67,11 +67,11 @@ export class UserService {
       }
       return updatedUser;
     } catch (error) {
-      throw new ErrorManager.createSignatureError(error.message);
+      throw ErrorManager.createSignatureError(error.message);
     }
   }
 
-  public async delete(id: string): Promise<DeleteResult | undefined> {
+  public async deleteUser(id: string): Promise<DeleteResult | undefined> {
     try {
       const deletedUser: DeleteResult = await this.userRepository.delete(id);
       if (deletedUser.affected === 0) {
@@ -82,7 +82,7 @@ export class UserService {
       }
       return deletedUser;
     } catch (error) {
-      throw new ErrorManager.createSignatureError(error.message);
+      throw ErrorManager.createSignatureError(error.message);
     }
   }
 }
