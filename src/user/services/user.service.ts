@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserDTO, UserUpdateDTO } from '../dto/user.dto';
+import { ErrorManager } from 'src/utils/error-manager';
 
 @Injectable()
 export class UserService {
@@ -15,23 +16,37 @@ export class UserService {
     try {
       return await this.userRepository.save(body);
     } catch (error) {
-      throw new Error(error);
+      throw new ErrorManager.createSignatureError(error.message);
     }
   }
 
   public async findAll(): Promise<UserEntity[]> {
     try {
-      return await this.userRepository.find();
+      const users: UserEntity[] = await this.userRepository.find();
+      if (!users.length) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'No users found',
+        });
+      }
+      return users;
     } catch (error) {
-      throw new Error(error);
+      throw new ErrorManager.createSignatureError(error.message);
     }
   }
 
   public async findOne(id: string): Promise<UserEntity> {
     try {
-      return await this.userRepository.findOneBy({ id });
+      const user: UserEntity = await this.userRepository.findOneBy({ id });
+      if (!user) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'User not found',
+        });
+      }
+      return user;
     } catch (error) {
-      throw new Error(error);
+      throw new ErrorManager.createSignatureError(error.message);
     }
   }
 
@@ -45,11 +60,14 @@ export class UserService {
         body,
       );
       if (updatedUser.affected === 0) {
-        return undefined;
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Unable to update user',
+        });
       }
       return updatedUser;
     } catch (error) {
-      throw new Error(error);
+      throw new ErrorManager.createSignatureError(error.message);
     }
   }
 
@@ -57,11 +75,14 @@ export class UserService {
     try {
       const deletedUser: DeleteResult = await this.userRepository.delete(id);
       if (deletedUser.affected === 0) {
-        return undefined;
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'Unable to delete user',
+        });
       }
       return deletedUser;
     } catch (error) {
-      throw new Error(error);
+      throw new ErrorManager.createSignatureError(error.message);
     }
   }
 }
