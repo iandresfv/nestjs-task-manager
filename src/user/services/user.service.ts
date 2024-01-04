@@ -1,16 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from '../entities';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { UserDTO, UserUpdateDTO } from '../dto/user.dto';
 import { ErrorManager } from 'src/utils/error-manager';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { UserDTO, UserToProjectDTO, UserUpdateDTO } from '../dto/user.dto';
+import { UserEntity, UserProjectEntity } from '../entities';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(UserProjectEntity)
+    private readonly userProjectRepository: Repository<UserProjectEntity>,
   ) {}
+
+  public async addUserToProject(
+    body: UserToProjectDTO,
+  ): Promise<UserToProjectDTO> {
+    try {
+      return await this.userProjectRepository.save(body);
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
 
   public async createUser(body: UserDTO): Promise<UserEntity> {
     try {
@@ -37,7 +49,12 @@ export class UserService {
 
   public async findUserById(id: string): Promise<UserEntity> {
     try {
-      const user: UserEntity = await this.userRepository.findOneBy({ id });
+      const user: UserEntity = await this.userRepository
+        .createQueryBuilder('user')
+        .where({ id })
+        .leftJoinAndSelect('user.projects', 'projects')
+        .leftJoinAndSelect('projects.project', 'project')
+        .getOne();
       if (!user) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',

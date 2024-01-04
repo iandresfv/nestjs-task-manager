@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { DeleteResult, UpdateResult } from 'typeorm';
-import { UserDTO, UserUpdateDTO } from '../dto/user.dto';
+import { UserDTO, UserToProjectDTO, UserUpdateDTO } from '../dto/user.dto';
 import { UserEntity } from '../entities';
 import { UserService } from '../services/user.service';
 
@@ -24,6 +24,11 @@ export class UserController {
   @Post()
   public async createUser(@Body() body: UserDTO): Promise<UserEntity> {
     return await this.userService.createUser(body);
+  }
+
+  @Post('add-to-project')
+  public async addUserToProject(@Body() body: UserToProjectDTO): Promise<any> {
+    return await this.userService.addUserToProject(body);
   }
 
   @Get(':id')

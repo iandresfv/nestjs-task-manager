@@ -37,9 +37,12 @@ export class ProjectService {
 
   public async findProjectById(id: string): Promise<ProjectEntity> {
     try {
-      const project: ProjectEntity = await this.projectRepository.findOneBy({
-        id,
-      });
+      const project: ProjectEntity = await this.projectRepository
+        .createQueryBuilder('project')
+        .where({ id })
+        .leftJoinAndSelect('project.users', 'users')
+        .leftJoinAndSelect('users.user', 'user')
+        .getOne();
       if (!project) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
