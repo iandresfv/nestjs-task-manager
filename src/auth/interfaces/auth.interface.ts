@@ -4,3 +4,8 @@ export interface PayloadToken {
   sub: string;
   role: ROLES;
 }
+
+export interface AuthPayload {
+  username: string;
+  password: string;
+}
