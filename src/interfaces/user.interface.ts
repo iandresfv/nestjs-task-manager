@@ -1,3 +1,5 @@
+import { ROLES } from 'src/constants';
+
 export interface IUser {
   firstName: string;
   lastName: string;
@@ -5,5 +7,5 @@ export interface IUser {
   email: string;
   username: string;
   password: string;
-  role: string;
+  role: ROLES;
 }
