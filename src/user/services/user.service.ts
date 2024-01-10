@@ -4,6 +4,7 @@ import { ErrorManager } from 'src/utils/error-manager';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserDTO, UserToProjectDTO, UserUpdateDTO } from '../dto/user.dto';
 import { UserEntity, UserProjectEntity } from '../entities';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -26,6 +27,7 @@ export class UserService {
 
   public async createUser(body: UserDTO): Promise<UserEntity> {
     try {
+      body.password = await bcrypt.hash(body.password, +process.env.HASH_SALT);
       return await this.userRepository.save(body);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);

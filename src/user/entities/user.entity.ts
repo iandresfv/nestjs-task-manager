@@ -3,6 +3,7 @@ import { BaseEntity } from '../../config';
 import { ROLES } from '../../constants';
 import { IUser } from '../../interfaces';
 import { UserProjectEntity } from './user-project.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity implements IUser {
@@ -21,6 +22,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ unique: true })
   username: string;
 
+  @Exclude()
   @Column()
   password: string;
 
